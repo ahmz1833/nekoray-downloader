@@ -16,11 +16,11 @@ This repository provides a Bash script to automatically download, install, and c
 
 
 ### ⚠️ Important Usage Notes
-Since the application runs as root, you must use **Tun Mode** for routing traffic. The **System Proxy** option will have no effect.
-
-If you need to use proxy mode instead of tunneling, you'll need to manually configure the proxy in your applications to use:
-- **Protocol:** SOCKS5
-- **Address:** 127.0.0.1:2080
+- You can Select **"Bypass Iran"** in the Routing menu. It will directly bypass Iranian traffic and it will not proxied.
+- Since the application runs as root, you must use **Tun Mode** for routing traffic. The **System Proxy** option will have no effect.
+- If you need to use proxy mode instead of tunneling, you'll need to manually configure the proxy in your applications to use:
+  - **Protocol:** SOCKS5
+  - **Address:** 127.0.0.1:2080
 
 ## 🔧 Prerequisites
 Make sure you have the following tools installed:
