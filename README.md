@@ -4,19 +4,17 @@ This repository provides a Bash script to automatically download, install, and c
 
 > ⚙️ **Note:** This script is an installer for [Mahdi-zarei/nekoray](https://github.com/Mahdi-zarei/nekoray/).
 
-
 ## 📦 What it does
 
-- Downloads and Install the latest (or specified) Nekoray release under `~/Apps/nekoray`
-- Creates a launcher script (`~/.local/bin/nekolaunch`) to run Nekoray as root.
-- Creates a desktop application entry for `nekolaunch`.
-- Apply Some Configuration and Add some subscriptions for first use.
+- Downloads and installs the latest (or specified) Nekoray release under `~/Apps/nekoray`
+- Creates a launcher script (`~/.local/bin/nekolaunch`) to run Nekoray as root
+- Creates a desktop application entry for `nekolaunch`
+- Applies some configuration and adds some subscriptions for first use
 
 > **Note that for first use, you must press Ctrl+U (Update Subscription) in each group to get the list of configs**
 
-
 ### ⚠️ Important Usage Notes
-- You can Select **"Bypass Iran"** in the Routing menu. It will directly bypass Iranian traffic and it will not proxied.
+- You can select **"Bypass Iran"** in the Routing menu. It will directly bypass Iranian traffic and will not be proxied.
 - Since the application runs as root, you must use **Tun Mode** for routing traffic. The **System Proxy** option will have no effect.
 - If you need to use proxy mode instead of tunneling, you'll need to manually configure the proxy in your applications to use:
   - **Protocol:** SOCKS5
