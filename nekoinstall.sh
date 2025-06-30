@@ -105,14 +105,14 @@ done
 # Create pm.json dynamically
 GROUP_IDS_JOINED=$(printf ",%s" "${GROUP_IDS[@]}")
 GROUP_IDS_JOINED="${GROUP_IDS_JOINED:1}"
-cat > "$APP_DIR/config/pm.json" <<EOF
+cat > "$APP_DIR/config/groups/pm.json" <<EOF
 {
     "groups": [${GROUP_IDS_JOINED}]
 }
 EOF
 
 echo "Downloading nekobox.json..."
-curl -s -o "$APP_DIR/nekobox.json" "$NEKOBOX_JSON_URL"
+curl -s -o "$APP_DIR/config/groups/nekobox.json" "$NEKOBOX_JSON_URL"
 
 # Ensure ~/.local/bin is in PATH
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then

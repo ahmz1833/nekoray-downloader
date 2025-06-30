@@ -45,7 +45,7 @@ nekolaunch
 ## 🧹 Uninstall
 Simply remove:
 ```bash
-rm -rf ~/Apps/nekoray ~/.local/bin/nekolaunch ~/.local/share/applications/nekoray.desktop
+sudo rm -rf ~/Apps/nekoray ~/.local/bin/nekolaunch ~/.local/share/applications/nekoray.desktop
 ```
 
 ## 📄 License
