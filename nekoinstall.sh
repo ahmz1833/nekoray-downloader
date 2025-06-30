@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -e
 
 # Configurable variables
@@ -12,6 +11,9 @@ DESKTOP_FILE="$HOME/.local/share/applications/nekoray.desktop"
 ICON_PATH="$APP_DIR/nekobox.png"
 APP_NAME="Nekoray VPN"
 COMMENT="NekoRay VPN (V2ray Application)"
+CONFIG_DIR="$APP_DIR/config/groups"
+SUBSCRIPTIONS_JSON_URL="https://raw.githubusercontent.com/ahmz1833/nekoray-downloader/main/subscriptions.json"
+NEKOBOX_JSON_URL="https://raw.githubusercontent.com/ahmz1833/nekoray-downloader/main/nekobox.json"
 
 # Ensure required tools
 for cmd in jq curl unzip; do
@@ -50,35 +52,91 @@ download_nekoray() {
 }
 
 # Parse argument (optional version)
+VERSION=""
 if [ $# -ge 1 ]; then
     VERSION="$1"
-else
-    VERSION=""
 fi
 
 download_nekoray "$VERSION"
 
-# Find downloaded zip file
 ZIP_FILE=*.zip
-
-# Ensure ~/Apps exists
 mkdir -p "$INSTALL_DIR"
 
-# Remove existing installation if any
-rm -rf "$APP_DIR"
+if [ -d "$APP_DIR" ]; then
+    echo "App directory already exists at $APP_DIR"
+    read -p "Do you want to overwrite it? [y/N]: " confirm
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+        rm -rf "$APP_DIR"
+    else
+        echo "Aborted by user."
+        rm -rf "$TMP_DIR"
+        exit 0
+    fi
+fi
 
-# Extract into ~/Apps
 echo "Extracting to $INSTALL_DIR..."
 unzip -q "$ZIP_FILE" -d "$INSTALL_DIR"
 
-# After unzip, folder should be $INSTALL_DIR/nekoray
 if [ ! -d "$APP_DIR" ]; then
     echo "Error: Expected folder $APP_DIR not found after extraction."
     exit 1
 fi
 
+# Install configs dynamically from external JSON
+mkdir -p "$CONFIG_DIR"
+echo "Downloading subscriptions JSON..."
+curl -s -o "$TMP_DIR/subscriptions.json" "$SUBSCRIPTIONS_JSON_URL"
+
+GROUP_IDS=()
+i=0
+jq -r 'to_entries[] | "\(.key):::\(.value)"' "$TMP_DIR/subscriptions.json" | while IFS=':::' read -r NAME URL; do
+    cat > "$CONFIG_DIR/$i.json" <<EOF
+{
+    "id": $i,
+    "info": "",
+    "name": "$NAME",
+    "url": "$URL"
+}
+EOF
+    GROUP_IDS+=("$i")
+    i=$((i+1))
+done
+
+# Create pm.json dynamically
+GROUP_IDS_JOINED=$(printf ",%s" "${GROUP_IDS[@]}")
+GROUP_IDS_JOINED="${GROUP_IDS_JOINED:1}"
+cat > "$APP_DIR/config/pm.json" <<EOF
+{
+    "groups": [${GROUP_IDS_JOINED}]
+}
+EOF
+
+echo "Downloading nekobox.json..."
+curl -s -o "$APP_DIR/nekobox.json" "$NEKOBOX_JSON_URL"
+
+# Ensure ~/.local/bin is in PATH
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    echo "Adding ~/.local/bin to PATH for this session..."
+    export PATH="$HOME/.local/bin:$PATH"
+    
+    # Add to shell profile if it doesn't exist
+    SHELL_PROFILE=""
+    if [ -f "$HOME/.bashrc" ]; then
+        SHELL_PROFILE="$HOME/.bashrc"
+    elif [ -f "$HOME/.zshrc" ]; then
+        SHELL_PROFILE="$HOME/.zshrc"
+    elif [ -f "$HOME/.profile" ]; then
+        SHELL_PROFILE="$HOME/.profile"
+    fi
+    
+    if [ -n "$SHELL_PROFILE" ] && ! grep -q 'export PATH="$HOME/.local/bin:$PATH"' "$SHELL_PROFILE"; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$SHELL_PROFILE"
+        echo "Added ~/.local/bin to PATH in $SHELL_PROFILE"
+        echo "Please restart your shell or run 'source $SHELL_PROFILE' to make it permanent."
+    fi
+fi
+
 # Create launcher script
-echo "Creating launcher script at $LAUNCHER..."
 mkdir -p "$(dirname "$LAUNCHER")"
 cat > "$LAUNCHER" <<EOF
 #!/bin/sh
@@ -86,8 +144,7 @@ pkexec env DISPLAY=\$DISPLAY XAUTHORITY=\$XAUTHORITY "$APP_DIR/nekoray"
 EOF
 chmod +x "$LAUNCHER"
 
-# Create .desktop file
-echo "Creating desktop entry at $DESKTOP_FILE..."
+# Create desktop file
 mkdir -p "$(dirname "$DESKTOP_FILE")"
 cat > "$DESKTOP_FILE" <<EOF
 [Desktop Entry]
@@ -103,5 +160,4 @@ EOF
 
 echo "Installation complete! You can launch Nekoray from your application menu or by running 'nekolaunch'."
 
-# Cleanup
 rm -rf "$TMP_DIR"
