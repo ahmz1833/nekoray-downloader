@@ -57,22 +57,22 @@ if [ $# -ge 1 ]; then
     VERSION="$1"
 fi
 
-download_nekoray "$VERSION"
-
-ZIP_FILE=*.zip
-mkdir -p "$INSTALL_DIR"
-
 if [ -d "$APP_DIR" ]; then
     echo "App directory already exists at $APP_DIR"
     read -p "Do you want to overwrite it? [y/N]: " confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
-        rm -rf "$APP_DIR"
+        sudo rm -rf "$APP_DIR"
     else
         echo "Aborted by user."
-        rm -rf "$TMP_DIR"
+        sudo rm -rf "$TMP_DIR"
         exit 0
     fi
 fi
+
+download_nekoray "$VERSION"
+
+ZIP_FILE=*.zip
+mkdir -p "$INSTALL_DIR"
 
 echo "Extracting to $INSTALL_DIR..."
 unzip -q "$ZIP_FILE" -d "$INSTALL_DIR"
