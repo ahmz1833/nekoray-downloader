@@ -90,6 +90,8 @@ curl -s -o "$TMP_DIR/subscriptions.json" "$SUBSCRIPTIONS_JSON_URL"
 GROUP_IDS=()
 i=0
 jq -r 'to_entries[] | "\(.key):::\(.value)"' "$TMP_DIR/subscriptions.json" | while IFS=':::' read -r NAME URL; do
+    # Remove leading :: if present
+    URL=${URL#::}
     cat > "$CONFIG_DIR/$i.json" <<EOF
 {
     "id": $i,
@@ -101,15 +103,6 @@ EOF
     GROUP_IDS+=("$i")
     i=$((i+1))
 done
-
-# Create pm.json dynamically
-GROUP_IDS_JOINED=$(printf ",%s" "${GROUP_IDS[@]}")
-GROUP_IDS_JOINED="${GROUP_IDS_JOINED:1}"
-cat > "$APP_DIR/config/groups/pm.json" <<EOF
-{
-    "groups": [${GROUP_IDS_JOINED}]
-}
-EOF
 
 echo "Downloading nekobox.json..."
 curl -s -o "$APP_DIR/config/groups/nekobox.json" "$NEKOBOX_JSON_URL"
