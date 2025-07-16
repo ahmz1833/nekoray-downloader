@@ -2,7 +2,7 @@
 
 This repository provides a Bash script to automatically download, install, and configure the **Nekoray VPN** client on Linux.
 
-> ⚙️ **Note:** This script is an installer for [Mahdi-zarei/nekoray](https://github.com/Mahdi-zarei/nekoray/).
+> ⚙️ **Note:** This script is an installer for [throneproj/nekoray](https://github.com/throneproj/nekoray).
 
 ## 📦 What it does
 
