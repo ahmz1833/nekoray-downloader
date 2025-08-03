@@ -2,7 +2,7 @@
 set -e
 
 # Configurable variables
-REPO="throneproj/nekoray"
+REPO="throneproj/Throne"
 ASSET_SUFFIX="linux64.zip"
 INSTALL_DIR="$HOME/Apps"
 APP_DIR="$INSTALL_DIR/nekoray"
