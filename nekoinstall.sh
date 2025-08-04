@@ -3,14 +3,14 @@ set -e
 
 # Configurable variables
 REPO="throneproj/Throne"
-ASSET_SUFFIX="linux64.zip"
+ASSET_SUFFIX="linux-amd64.zip"
 INSTALL_DIR="$HOME/Apps"
-APP_DIR="$INSTALL_DIR/nekoray"
+APP_DIR="$INSTALL_DIR/Throne"
 LAUNCHER="$HOME/.local/bin/nekolaunch"
-DESKTOP_FILE="$HOME/.local/share/applications/nekoray.desktop"
+DESKTOP_FILE="$HOME/.local/share/applications/throne.desktop"
 ICON_PATH="$APP_DIR/nekobox.png"
-APP_NAME="Nekoray VPN"
-COMMENT="NekoRay VPN (V2ray Application)"
+APP_NAME="Throne(Nekoray) VPN"
+COMMENT="Throne(Nekoray) VPN (V2ray Application)"
 CONFIG_DIR="$APP_DIR/config"
 SUBSCRIPTIONS_JSON_URL="https://raw.githubusercontent.com/ahmz1833/nekoray-downloader/main/subscriptions.json"
 NEKOBOX_JSON_URL="https://raw.githubusercontent.com/ahmz1833/nekoray-downloader/main/nekobox.json"
@@ -22,6 +22,13 @@ for cmd in jq curl unzip; do
 		exit 1
 	fi
 done
+
+DOWNLOAD_COMMAND="aria2c --max-connection-per-server=16 --min-split-size=1M"
+if ! command -v aria2c &>/dev/null; then
+	echo "Warning: aria2c doesn't exist, falling back to curl!" >&2
+	echo "      -> for faster download speed install aria2c" >&2
+	DOWNLOAD_COMMAND="curl -LO"
+fi
 
 # Download asset
 download_nekoray() {
@@ -44,7 +51,7 @@ download_nekoray() {
 	fi
 
 	echo "Downloading: $download_url"
-	curl -LO "$download_url"
+	$DOWNLOAD_COMMAND "$download_url"
 }
 
 NO_DOWNLOAD=false
@@ -157,7 +164,7 @@ fi
 mkdir -p "$(dirname "$LAUNCHER")"
 cat > "$LAUNCHER" <<EOF
 #!/bin/sh
-pkexec env DISPLAY=\$DISPLAY XAUTHORITY=\$XAUTHORITY "$APP_DIR/nekoray"
+pkexec env DISPLAY=\$DISPLAY XAUTHORITY=\$XAUTHORITY "$APP_DIR/Throne"
 EOF
 chmod +x "$LAUNCHER"
 
@@ -175,6 +182,6 @@ MimeType=application/x-desktop;
 Terminal=false
 EOF
 
-echo "Installation complete! You can launch Nekoray from your application menu or by running 'nekolaunch'."
+echo "Installation complete! You can launch Throne(Nekoray) from your application menu or by running 'nekolaunch'."
 
 rm -rf "$TMP_DIR"
